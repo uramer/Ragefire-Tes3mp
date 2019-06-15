@@ -8,9 +8,10 @@ racialbonuses.use = function(eventStatus, pid)
 
 local self = Players[pid]
 
--- Racial Bonuses	
-	if self.data.character.race == "argonian" then
+if self.data.character.race == "argonian" then
 		logicHandler.RunConsoleCommandOnPlayer(self.pid, 'removespell "argonian breathing"')
+		logicHandler.RunConsoleCommandOnPlayer(self.pid, 'removespell "immune to poison"')
+		logicHandler.RunConsoleCommandOnPlayer(self.pid, 'addspell "resist_poison_20"')
 		logicHandler.RunConsoleCommandOnPlayer(self.pid, 'addspell "argonian_breathing"')
 		logicHandler.RunConsoleCommandOnPlayer(self.pid, 'addspell "argonian_power"')
 	end
