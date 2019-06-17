@@ -223,7 +223,7 @@ config.homecitySpawns["Caldera"] = {
     rot = { 0, -75.636917 }
 }
 config.homecitySpawns["Seyda Neen"] = {
-    cell ="-2, -9",
+    cell = "-2, -9",
     pos = { -10088, -71371, 152 },
     rot = { .2, .80, }
 }
