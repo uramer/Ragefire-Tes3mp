@@ -52,8 +52,8 @@ config.transportLocation["Caldera"] = {
 -- Seyda Neen
 config.transportLocation["Seyda Neen"] = {
     cell ="-2, -9",
-    pos = { -10595, -71392, 161 },
-    rot = { .2, 2.925, }
+    pos = { -10088, -71371, 152 },
+    rot = { .2, .80, }
 }
 -- Suran
 config.transportLocation["Suran"] = {
@@ -223,9 +223,9 @@ config.homecitySpawns["Caldera"] = {
     rot = { 0, -75.636917 }
 }
 config.homecitySpawns["Seyda Neen"] = {
-    cell = "-2, -9",
-    pos = { -11173.67, -70825.265625, 228 },
-    rot = { 0.0627148, -0.624551 }
+    cell ="-2, -9",
+    pos = { -10088, -71371, 152 },
+    rot = { .2, .80, }
 }
 config.homecitySpawns["Suran"] = {
     cell = "6, -7",
