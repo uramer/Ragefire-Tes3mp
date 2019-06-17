@@ -1,23 +1,22 @@
 rageExp = {}
 rageExp.IDsToPoints = jsonInterface.load("rageExp.json")
-rageExp.rageCustomVariables = { "rageExp", "rageExpProgress", "rageLevel", "ragePointsSpent", "ragePoints","magicTreePoints", "magicPointsSpent", "warTreePoints", "warPointsSpent",
- "defensePointsSpent", "healerPointsSpent", "stealthPointsSpent", "defenseLifePool", "defenseRegeneration", "defenseSwiftness", "defenseResilience", "defenseEvasion", "defenseTurtleShell", 
- "defenseVitality", "defenseDumbBrute", "defenseSafeguard", "defenseResistFire", "defenseResistFrost", "defenseResistShock", "defenseResistPoison", "stealthGreed", "stealthSerpentsBlood", "stealthGlibFeet", 
- "stealthSlipperyMind", "stealthHunterInTheNight", "stealthThief", "stealthSecretPockets", "stealthCloakDagger", "stealthPoisonTips", "stealthAssassinate", "healerHealingHands", "healerManaSource", "healerStrengthenedMind", 
- "healerGuidance", "healerClericsBlessing", "healerProtectiveShell", "healerToughness", "healerLastResort", "healerFireIce", "healerGroupMorale", "warFatiguePool", "warCourage", "warHaste", "warCardio", "warAccuracy", 
- "warFighterStance", "warReinforcement", "warSurgeOfStrength", "warConditioning", "warCallToArms", "magicClarity", "magicHavoc", "magicSummoner", "magicWisdom", "magicExtraMana", "magicMagePower", "magicSorcerer", 
- "magicMindControl", "magicBattleMage", "magicWizardStrength" }
-	
+rageExp.rageCustomVariables = { "rageExp", "rageExpProgress", "rageLevel", "ragePointsSpent", "ragePoints", "warriorFatigueRegen", "warriorBlockSkill", "warriorProficiency", "warriorWeaponMasteryChosen", "warriorAddStrength", "warriorShockingStrike", "warriorFreezingStrike", "warriorMagicResistance", "warriorAddAgility", "warriorPoisonResistance", "warriorMagickaRegen", "resistanceMasteryChosen", "warriorResistFrostMastery", "warriorResistFireMastery", "warriorArmorMasteryChosen", "warriorHeavyArmorMastery", "warriorMediumArmorMastery", "warriorResistanceMasteryChosen", "warriorHealthRegen", "nightbladeProficiency", "nightbladeFatigueRegen", "nightbladeSmokeScreen", "nightbladeShortbladeMastery", "nightbladeDarkStrength", "nightbladeAcrobatics" }
+rageExp.rageCustomVariables2 = { "ragePointsMax" }
 	
 rageExp.Login = function(eventStatus, pid)
-	if Players[pid].data.customVariables["ragePoints"] == nil then Players[pid].data.customVariables["ragePoints"] = 3 end
 
-	for _, value in pairs(rageExp.rageCustomVariables) do
-		if Players[pid].data.customVariables[value] == nil then
-			Players[pid].data.customVariables[value] = 0
-		end
-	end
+if eventStatus.validCustomHandlers then --check if some other script made this event obsolete
+
+if Players[pid].data.customVariables["ragePointsMax"] == nil then Players[pid].data.customVariables["ragePointsMax"] = 100 end
+
+for _, value in pairs(rageExp.rageCustomVariables) do
+if Players[pid].data.customVariables[value] == nil then
+	Players[pid].data.customVariables[value] = 0
 end
+end
+end
+end
+
 
 rageExp.ProcessLatestKill = function(pid, refId)
 	
@@ -122,6 +121,8 @@ end
 
 rageExp.Decide = function(eventStatus, pid, cellDescription)
 
+if eventStatus.validCustomHandlers then --check if some other script made this event obsolete
+
         local uniqueIndex = tes3mp.GetActorRefNum(0) .. "-" .. tes3mp.GetActorMpNum(0)
 
 			if tes3mp.DoesActorHavePlayerKiller(0) then
@@ -146,6 +147,7 @@ rageExp.Decide = function(eventStatus, pid, cellDescription)
              end
 			end
 end
+end
 
 rageExp.Help = function(pid, cmd)
         -- Check "scripts/menu/help.lua" if you want to change the contents of the help menus
@@ -164,19 +166,19 @@ rageExp.cmd = function(pid, cmd)
 				Players[pid].data.customVariables.rageExpProgress = expForNextLevel - expTowardsNextLevel
 				Players[pid].data.customVariables.rageExpRequired = nextLevel - nextLevelTotal + 60
 				Players[pid].data.customVariables.rageExpPercentage = math.floor(Players[pid].data.customVariables.rageExpProgress / Players[pid].data.customVariables.rageExpRequired * 100)
-				Players[pid].currentCustomMenu = "ragepoint main"
+				Players[pid].currentCustomMenu = "warrior tree"
 				menuHelper.DisplayMenu(pid, Players[pid].currentCustomMenu)		
 			elseif currentRageLevel == 1 then
 				Players[pid].data.customVariables.rageExpProgress = expForNextLevel - expTowardsNextLevel - 60
 				Players[pid].data.customVariables.rageExpRequired = nextLevel - nextLevelTotal - 60
 				Players[pid].data.customVariables.rageExpPercentage = math.floor(Players[pid].data.customVariables.rageExpProgress / Players[pid].data.customVariables.rageExpRequired * 100)
-				Players[pid].currentCustomMenu = "ragepoint main"
+				Players[pid].currentCustomMenu = "warrior tree"
 				menuHelper.DisplayMenu(pid, Players[pid].currentCustomMenu)
 			else			
 			Players[pid].data.customVariables.rageExpProgress = expForNextLevel - expTowardsNextLevel
 			Players[pid].data.customVariables.rageExpRequired = nextLevel - nextLevelTotal
 			Players[pid].data.customVariables.rageExpPercentage = math.floor(Players[pid].data.customVariables.rageExpProgress / Players[pid].data.customVariables.rageExpRequired * 100)
-			Players[pid].currentCustomMenu = "ragepoint main"
+			Players[pid].currentCustomMenu = "warrior tree"
 			menuHelper.DisplayMenu(pid, Players[pid].currentCustomMenu)
 			end
 end
@@ -219,4 +221,5 @@ customCommandHooks.registerCommand("water", rageExp.abilityCmd)
 customCommandHooks.registerCommand("rage", rageExp.cmd)
 customCommandHooks.registerCommand("help", rageExp.Help)
 customEventHooks.registerHandler("OnActorDeath", rageExp.Decide)
-customEventHooks.registerHandler("OnPlayerConnect", rageExp.Login)
+customEventHooks.registerHandler("OnPlayerFinishLogin", rageExp.Login)
+customEventHooks.registerHandler("OnPlayerEndCharGen", rageExp.Login)
