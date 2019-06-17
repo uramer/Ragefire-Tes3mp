@@ -43,7 +43,7 @@ add menus
 (remove endchargen from "chargen" menu)
 
 ```
-config.menuHelperFiles = { "help", "defaultCrafting", "advancedExample", "rage", "crafting", "fletching", "shopItems", "cannotLoot", "changeLog", "charGen", "charGenClothes", "chatMenu", "crafting", "craftingRecipes", "defaultCrafting", "fletchingRecipes", "help", "helpRagefire", "leatherMenu", "leatherRecipeMenu", "legendaryItemsMenu", "mainQuest", "menuguilds", "menuquest", "tailoring", "teleportMenu", "transporters", "tutorial" }
+{ "help", "defaultCrafting", "advancedExample", "rage", "crafting", "fletching", "shopItems", "cannotLoot", "changeLog", "charGen", "charGenClothes", "charGenWeapons", "chatMenu", "crafting", "craftingRecipes", "defaultCrafting", "fletchingRecipes", "help", "helpRagefire", "leatherMenu", "leatherRecipeMenu", "legendaryItemsMenu", "mainQuest", "menuguilds", "menuquest", "tailoring", "teleportMenu", "transporters", "tutorial", "rageTreeWarrior", "rageTreeNightBlade", "newCrafting", "craftingRecipeLearning" }
 ```
 
 
