@@ -12,8 +12,6 @@ refNumDeletionsByCell = jsonInterface.load("refNumDeletionsByCell.json") -- chec
 
 preObjectsAndDeletions.FixCell = function(eventStatus, pid)
  
-if eventStatus.validCustomHandlers then --check if some other script made this event obsolete
-
  cellDescription = tes3mp.GetCell(pid)
  
     if refNumDeletionsByCell[cellDescription] ~= nil then
@@ -32,12 +30,53 @@ if eventStatus.validCustomHandlers then --check if some other script made this e
         tes3mp.SendObjectDelete()
     end
 end
-end
-
 
 preObjectsAndDeletions.AddPreexistingObjects = function(eventStatus, pid, cellDescription)
 
-if eventStatus.validCustomHandlers then --check if some other script made this event obsolete
+    if Players[pid].LoadedCells == nil then Players[pid].LoadedCells = {} end
+    if WorldInstance.data.LoadedCells == nil then WorldInstance.data.LoadedCells = {} end
+
+    if preexistingObjects[cellDescription] ~= nil then
+
+        if tableHelper.containsValue(Players[pid].LoadedCells, cellDescription) == false then
+            if WorldInstance.data.LoadedCells[cellDescription] == nil then
+            
+                WorldInstance.data.LoadedCells[cellDescription] = {}
+                
+                local objectsToSpawn = {}
+                local objectsToPlace = {}
+
+                for arrayIndex, object in pairs(preexistingObjects[cellDescription]) do
+
+                    if object.packetType == "spawn" then
+                        table.insert(objectsToSpawn, object)
+                    elseif object.packetType == "place" then
+                        table.insert(objectsToPlace, object)
+                    end
+                end
+
+                LoadedCells[cellDescription].forceActorListRequest = true
+
+                local spawnedUniqueIndexes = logicHandler.CreateObjects(cellDescription, objectsToSpawn, "spawn")
+                local placedUniqueIndexes = logicHandler.CreateObjects(cellDescription, objectsToPlace, "place")
+                for _, uniqueIndex in pairs(spawnedUniqueIndexes) do
+                    local mpNum = uniqueIndex:split("-")[2]
+                    table.insert(WorldInstance.data.LoadedCells[cellDescription], {uniqueIndex = uniqueIndex, mpNum = mpNum})
+                end
+
+                for _, uniqueIndex in pairs(placedUniqueIndexes) do
+                    local mpNum = uniqueIndex:split("-")[2]
+                    table.insert(WorldInstance.data.LoadedCells[cellDescription], {uniqueIndex = uniqueIndex, mpNum = mpNum})
+                end
+             
+                table.insert(Players[pid].LoadedCells, cellDescription)
+            end
+        end
+    end
+end
+
+--[[
+preObjectsAndDeletions.AddPreexistingObjects = function(eventStatus, pid, cellDescription)
 
 if Players[pid].LoadedCells == nil then Players[pid].LoadedCells = {} end
 if WorldInstance.data.LoadedCells == nil then WorldInstance.data.LoadedCells = {} end
@@ -58,19 +97,19 @@ if tableHelper.containsValue(Players[pid].LoadedCells, cellDescription) == false
 			end
 	 
 			LoadedCells[cellDescription].forceActorListRequest = true
-			table.insert(Players[pid].LoadedCells, cellDescription)
+			table.insert(Players[pid].LoadedCells, cellDescription)]]--
 	--[[else -- no respawn since celldata gets respawn automatically
 		print("\n RELOADED CELL \n")
 		for _, object in pairs(WorldInstance,LoadedCells[cellDescription]) do
 			preObjectsAndDeletions.RespawnHelperForOne(pid, object.uniqueIndex, object.mpNum, cellDescription)
 		end
 			table.insert(Players[pid].LoadedCells, cellDescription)]]--
+			--[[
 	end
 end
 end
 end
-end
-
+]]--
 preObjectsAndDeletions.RespawnHelperForOne = function(pid, uniqueIndex, mpNum, cellDescription)
 --respawn object for player
 				local pid = pid
@@ -179,9 +218,6 @@ preObjectsAndDeletions.OffDeleteCommand = function(pid, cmd)
 end
 
 preObjectsAndDeletions.OnObjectActivate = function(eventStatus, pid, cellDescription, objects, players)
-
-if eventStatus.validCustomHandlers then --check if some other script made this event obsolete
-
             if Players[pid].data.deletemode ~= nil and Players[pid].data.deletemode == true then -- disables all activations and adds them to refnumdeletions
                 isValid = false
                 
@@ -198,8 +234,7 @@ if eventStatus.validCustomHandlers then --check if some other script made this e
                 
                 jsonInterface.save("refNumDeletionsByCell.json", refNumDeletionsByCell)
                 tes3mp.SendMessage(pid, "Deleted refNum: " .. tes3mp.GetObjectRefNum(index) .. "\n", false)
-			end
-end
+	end
 end
 
 
