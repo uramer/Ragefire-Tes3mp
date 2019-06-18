@@ -24,12 +24,15 @@ starteritems = {}
 
 
 starteritems.OnPlayerEndCharGen = function(eventStatus, pid)
+local self = Players[pid]
     if Players[pid] ~= nil and Players[pid]:IsLoggedIn() then
+		logicHandler.RunConsoleCommandOnPlayer(self.pid, 'additem "gold_001"50')
+		logicHandler.RunConsoleCommandOnPlayer(self.pid, 'additem "pick_apprentice_01"1')
         Players[pid]:SaveEquipment()
         Players[pid].currentCustomMenu = "appearance"
         menuHelper.DisplayMenu(pid, Players[pid].currentCustomMenu)
     end
 end
-
+-- calls also the choose homecity menus etc .. 
 
 customEventHooks.registerHandler("OnPlayerEndCharGen", starteritems.OnPlayerEndCharGen)
