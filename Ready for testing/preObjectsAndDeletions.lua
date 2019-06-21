@@ -427,43 +427,62 @@ end
 
 
 saveme.exactRef = function(pid, cmd)
-cmd2 = cmd[2]
-preTable = {}
 
---create or read json
+local preTable = {}
 
-		preTable = jsonInterface.load("preObjects.json")
+	if cmd[2] == ("spawn" or "place") and cmd[3] ~= nil then
 
-	
---create table for this point
-local cell = tes3mp.GetCell(pid)
+		--read json
 
-local locref = cmd2
+			preTable = jsonInterface.load("preObjects.json")
+			
+			
+		--create table for this point
+
+			local cell = tes3mp.GetCell(pid)
 
 
-local loc = {
-        packetType = "spawn",
-        refId = locref,
-        location = { posX = tes3mp.GetPosX(pid), posY = tes3mp.GetPosY(pid), posZ = tes3mp.GetPosZ(pid), rotX = tes3mp.GetRotX(pid), rotY = 0, rotZ= tes3mp.GetRotZ(pid) }
-        }
+			local locoloco = {
+					packetType = cmd[2],
+					refId = cmd[3],
+					location = { posX = tes3mp.GetPosX(pid), posY = tes3mp.GetPosY(pid), posZ = tes3mp.GetPosZ(pid), rotX = tes3mp.GetRotX(pid), rotY = 0, rotZ= tes3mp.GetRotZ(pid) }
+					}
+			
+		-- create cell key if not exists
+			if preTable[cell] == nil then preTable[cell] = {} end 
+			
+			
 
-if preTable[cell] ~= nil then
-else
-preTable[cell] = {}
+		--save table to json
+			table.insert(preTable[cell],locoloco)
+			jsonInterface.save("preObjects.json", preTable, config.playerKeyOrder)
+
+		-- create object to see it
+			logicHandler.CreateObjectAtLocation(cell, locoloco.location, locoloco.refId, locoloco.packetType)
+			
+		-- save this command for the "again" command
+			Players[pid].LastCommand = {[1] = cmd[1], [2] = cmd[3], [3] = cmd[3]}
+			
+		-- finish
+			tes3mp.SendMessage(pid,"saved bro\n",false)
+	else
+		tes3mp.SendMessage(pid,"that was wrong\n",false)
+	end
+
 end
 
-
---save table to json
-table.insert(preTable[cell],loc)
-jsonInterface.save("preObjects.json", preTable, config.playerKeyOrder )
-logicHandler.CreateObjectAtLocation(cell, loc.location, locref, "spawn")
-tes3mp.SendMessage(pid,"saved bro\n"..cell,false)
+saveme.exactRefAgain = function(pid, cmd)
+	if Players[pid].LastCommand ~= nil then
+	 -- just do 
+	 saveme.exactRef(pid, Players[pid].LastCommand)
+	end
 end
 
 
 customCommandHooks.registerCommand("save1", saveme.save2)
 customCommandHooks.registerCommand("save2", saveme.save)
-customCommandHooks.registerCommand("save3", saveme.exactRef)
+customCommandHooks.registerCommand("ref", saveme.exactRef)
+customCommandHooks.registerCommand("again", saveme.exactRefAgain)
 customCommandHooks.registerCommand("delete", preObjectsAndDeletions.DeleteCommand)
 customCommandHooks.registerCommand("delete", preObjectsAndDeletions.OffDeleteCommand)
 customEventHooks.registerHandler("OnObjectActivate", preObjectsAndDeletions.OnObjectActivate)
