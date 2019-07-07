@@ -4,46 +4,70 @@
 
 racialbonuses = {}
 
-racialbonuses.use = function(eventStatus, pid)
+racialbonuses.SendSpells = function(pid, remove, add)
+    if table.getn(remove) > 0 then
+        tes3mp.ClearSpellbookChanges(pid)
+        tes3mp.SetSpellbookChangesAction(pid, enumerations.spellbook.REMOVE)
 
-local self = Players[pid]
--- Racial Bonuses
-	if self.data.character.race == "argonian" then
-		logicHandler.RunConsoleCommandOnPlayer(self.pid, 'removespell "argonian breathing"')
-		logicHandler.RunConsoleCommandOnPlayer(self.pid, 'removespell "immune to poison"')
-		logicHandler.RunConsoleCommandOnPlayer(self.pid, 'addspell "resist_poison_20"')
-		logicHandler.RunConsoleCommandOnPlayer(self.pid, 'addspell "argonian_breathing"')
-		logicHandler.RunConsoleCommandOnPlayer(self.pid, 'addspell "argonian_power"')
-	end
-	if self.data.character.race == "khajiit" then
-		logicHandler.RunConsoleCommandOnPlayer(self.pid, 'removespell "eye of night"')
-		logicHandler.RunConsoleCommandOnPlayer(self.pid, 'addspell "eye_of_night"')
-		logicHandler.RunConsoleCommandOnPlayer(self.pid, 'addspell "khajiit_power"')
-	end
-	if self.data.character.race == "Dark Elf" then
-		logicHandler.RunConsoleCommandOnPlayer(self.pid, 'removespell "ancestor guardian"')
-		logicHandler.RunConsoleCommandOnPlayer(self.pid, 'addspell "ancestor_guardian"')
-		logicHandler.RunConsoleCommandOnPlayer(self.pid, 'removespell "resist fire_75"')
-		logicHandler.RunConsoleCommandOnPlayer(self.pid, 'addspell "resist fire_50"')
-	end
-	if self.data.character.race == "breton" then
-		logicHandler.RunConsoleCommandOnPlayer(self.pid, 'removespell "resist magicka_50"')
-		logicHandler.RunConsoleCommandOnPlayer(self.pid, 'addspell "resist_magicka_35"')
-	end
-	if self.data.character.race == "nord" then
-		logicHandler.RunConsoleCommandOnPlayer(self.pid, 'removespell "resist shock_50"')
-		logicHandler.RunConsoleCommandOnPlayer(self.pid, 'removespell "immune to frost"')
-		logicHandler.RunConsoleCommandOnPlayer(self.pid, 'addspell "resist frost_75"')
-	end
-	if self.data.character.race == "wood elf" then
-		logicHandler.RunConsoleCommandOnPlayer(self.pid, 'addspell "bosmer_marksman"')
-	end
-	if self.data.character.race == "high elf" then	
-		logicHandler.RunConsoleCommandOnPlayer(self.pid, 'removespell "weakness fire_50"')
-		logicHandler.RunConsoleCommandOnPlayer(self.pid, 'removespell "weakness magicka_50"')
-		logicHandler.RunConsoleCommandOnPlayer(self.pid, 'addspell "weakness_fire_25"')
-		logicHandler.RunConsoleCommandOnPlayer(self.pid, 'addspell "weakness_magicka_25"')
-	end	
+        for _, spellId in pairs(remove) do
+            tes3mp.AddSpell(pid, spellId)
+        end
+
+        tes3mp.SendSpellbookChanges(pid)
+    end
+
+    if table.getn(add) > 0 then
+        tes3mp.ClearSpellbookChanges(pid)
+        tes3mp.SetSpellbookChangesAction(pid, enumerations.spellbook.ADD)
+
+        for _, spellId in pairs(add) do
+            tes3mp.AddSpell(pid, spellId)
+        end
+
+        tes3mp.SendSpellbookChanges(pid)
+    end
 end
 
-customEventHooks.registerHandler("OnPlayerFinishLogin", racialbonuses.use)
+racialbonuses.raceData = {
+    ["argonian"] = {
+        remove = {"argonian breathing", "immune to poison"},
+        add = {"resist_poison_20", "argonian_breathing", "argonian_power"}
+    },
+    ["khajiit"] = {
+        remove = {"eye of night"},
+        add = {"eye of night", "khajiit_power"}
+    },
+    ["Dark Elf"] = {
+        remove = {"ancestor guardian", "resist fire_75"},
+        add = {"ancestor guardian", "resist fire_50"}
+    },
+    ["breton"] = {
+        remove = {"resist magicka_50"},
+        add = {"resist magicka_35"}
+    },
+    ["nord"] = {
+        remove = {"resist shock_50", "immune to frost"},
+        add = {"resist frost_75"}
+    },
+    ["wood elf"] = {
+        remove = {},
+        add = {"bosmer_marksman"}
+    },
+    ["high elf"] = {
+        remove = {"weakness fire_50", "weakness magicka_50"},
+        add = {"weakness_fire_25", "weakness_magicka_25"}
+    }
+}
+
+racialbonuses.OnPlayerAutherized = function(eventStatus, pid)
+    local pid = Players[pid].pid
+
+    local raceName = Players[pid].data.character.race
+    local race = racialbonuses.raceData[raceName]
+    
+    if race ~= nil then
+        racialbonuses.SendSpells(pid, race.remove, race.add)
+    end
+end
+
+customEventHooks.registerHandler("OnPlayerAutherized", racialbonuses.OnPlayerAutherized)
