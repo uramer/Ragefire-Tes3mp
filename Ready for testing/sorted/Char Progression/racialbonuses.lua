@@ -10,6 +10,7 @@ racialbonuses.SendSpells = function(pid, remove, add)
         tes3mp.SetSpellbookChangesAction(pid, enumerations.spellbook.REMOVE)
 
         for _, spellId in pairs(remove) do
+            tableHelper.removeValue(Players[pid].data.spellbook, spellId)
             tes3mp.AddSpell(pid, spellId)
         end
 
@@ -21,11 +22,15 @@ racialbonuses.SendSpells = function(pid, remove, add)
         tes3mp.SetSpellbookChangesAction(pid, enumerations.spellbook.ADD)
 
         for _, spellId in pairs(add) do
+            tableHelper.removeValue(Players[pid].data.spellbook, spellId)
+            table.insert(Players[pid].data.spellbook, spellId)
             tes3mp.AddSpell(pid, spellId)
         end
 
         tes3mp.SendSpellbookChanges(pid)
     end
+
+    tableHelper.cleanNils(Players[pid].data.spellbook)
 end
 
 racialbonuses.raceData = {
